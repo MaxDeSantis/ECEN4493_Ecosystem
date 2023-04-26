@@ -78,21 +78,23 @@ class SimulationManager:
         
     
     def plot_sim_results(self):
-        fig, ax = plt.subplots(5, 1)
+        fig, ax = plt.subplots(1, 5)
         epoch_iter = int(self.params.sim_epochs * 0.2)
         x = np.arange(self.params.simulation_duration)
 
         for i, j in enumerate(range(0, self.params.sim_epochs, epoch_iter)):
             
             #ax[i].plot(x, self.sim_data[j,:,0], label=f'Plants {j}')
-            ax[i].plot(x, self.sim_data[j,:,1], label=f'Herbivores epoch {j}')
-            ax[i].plot(x, self.sim_data[j,:,2], label=f'Carnivores epoch {j}')
+            ax[i].plot(x, self.sim_data[j,:,1], label=f'Herbivores')
+            ax[i].plot(x, self.sim_data[j,:,2], label=f'Carnivores')
             
-            ax[i].set_xlabel('Simulation Iteration')
-            ax[i].set_ylabel('Count')
-            ax[i].legend()
+            ax[i].set_xlabel(f'Simulation Iteration, N={j}')
+            ax[i].set_ylabel('Population')
+            
+            #ax[i].legend()
+            ax[i].legend(loc='upper right')
 
-        plt.tight_layout()
+       # plt.tight_layout()
         plt.show()
         
     def generate_initial_plants(self):
@@ -233,6 +235,8 @@ class SimulationManager:
 
     def run_simulation(self):
         
+        input('Press enter to start simulation')
+        
         for i in range(self.params.sim_epochs):
             print(f'Running simulation epoch {i+1} of {self.params.sim_epochs}')
             
@@ -244,7 +248,7 @@ class SimulationManager:
                 self.update_carnivores()
                 self.print_sim_status()
                 self.update_sim_status()
-                self.vis.draw_state(self.herbivores, self.carnivores, self.plants)
+                self.vis.draw_state(self.epoch_count, self.herbivores, self.carnivores, self.plants)
                 self.sim_iteration += 1
                 time.sleep(self.params.sim_iteration_delay)
                 if self.herbivore_count == 0 and self.carnivore_count == 0:

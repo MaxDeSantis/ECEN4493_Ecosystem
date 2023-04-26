@@ -28,7 +28,7 @@ class SimulationParameters:
         
         self.mutation_percentage = 0.1
         
-        self.sim_epochs = 10
+        self.sim_epochs = 5
         
         self.max_herbivores = 10 * self.num_herbivores
         self.max_carnivores = 10 * self.num_carnivores
