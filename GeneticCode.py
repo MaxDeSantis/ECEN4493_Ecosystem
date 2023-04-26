@@ -20,6 +20,12 @@ class GeneticCode:
         hunger_urge_increase = 5
         hunt_success_chance = 6
         prey_flee_chance = 7
+        hunt_selection_range = 8
+        hunt_tenacity = 9
+        wander_dir_change = 10
+        wander_dir_change_chance = 11
+        gestation_period = 12
+        litter_size = 13
     
     def __init__(self, genes:np.ndarray = None):
         
@@ -28,7 +34,12 @@ class GeneticCode:
         else:
             self.genes = np.random.randint(1, 30, len(GeneticCode.Gene))
         
-            
+        self.genes[self.Gene.hunt_selection_range.value] = min(self.Gene.hunt_selection_range.value, 30)
+        
+        self.genes[self.Gene.wander_dir_change.value] = np.random.randint(1, 10)
+        self.genes[self.Gene.litter_size.value] = np.random.randint(1, 4)
+        self.genes[self.Gene.gestation_period.value] = np.random.randint(1, 10)
+        
     def __getitem__(self, key):
         return self.genes[key]
 

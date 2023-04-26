@@ -49,6 +49,9 @@ def move_to(position, direction, distance, params:SimulationParameters):
     new_pos = update_bounds(Position(x, y), params)
     return new_pos
 
+def dir_lerp(dir1, dir2, t):
+    return (dir1 + (dir2 - dir1) * t) % (2 * math.pi)
+
 def update_bounds(position:Position, params:SimulationParameters):
     if position.x < params.x_min:
         position.x = params.x_min

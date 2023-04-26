@@ -78,18 +78,21 @@ class SimulationManager:
         
     
     def plot_sim_results(self):
-        fig, ax = plt.subplots()
-        
-        # graph sim data
+        fig, ax = plt.subplots(5, 1)
+        epoch_iter = int(self.params.sim_epochs * 0.2)
         x = np.arange(self.params.simulation_duration)
-        ax.plot(x, self.sim_data[:,:,0], label='Plants')
-        ax.plot(x, self.sim_data[:,:,1], label='Herbivores')
-        ax.plot(x, self.sim_data[:,:,2], label='Carnivores')
-        
-        ax.set_xlabel('Simulation Iteration')
-        ax.set_ylabel('Number of Plants/Herbivores/Carnivores')
-        
-        ax.legend()
+
+        for i, j in enumerate(range(0, self.params.sim_epochs, epoch_iter)):
+            
+            #ax[i].plot(x, self.sim_data[j,:,0], label=f'Plants {j}')
+            ax[i].plot(x, self.sim_data[j,:,1], label=f'Herbivores epoch {j}')
+            ax[i].plot(x, self.sim_data[j,:,2], label=f'Carnivores epoch {j}')
+            
+            ax[i].set_xlabel('Simulation Iteration')
+            ax[i].set_ylabel('Count')
+            ax[i].legend()
+
+        plt.tight_layout()
         plt.show()
         
     def generate_initial_plants(self):
@@ -130,6 +133,8 @@ class SimulationManager:
                 new_herbi = Herbivore(self.params.herbivore_energy_value, self.params, new_genome, self, self.rand_instance, 0)
                 self.herbivores.append(new_herbi)
         
+        self.carnivores.clear()
+        self.carnivore_count = 0
         for i in range(self.num_best_carni):
             for j in range(carni_mutations):
                 new_genome = gc.mutate(self.best_carnivores[i].genes, self.params.mutation_percentage)
@@ -161,21 +166,26 @@ class SimulationManager:
             carni.SIM_update()
 
             
-    def breed_animals(self, animal1:Animal, animal2:Animal):
+    def spawn_animal(self, animal1:Animal, animal2:Animal):
         new_genes = gc.crossover(animal1.genes, animal2.genes)
         new_generation = max(animal1.generation, animal2.generation) + 1
         if isinstance(animal1, Herbivore):
             if self.herbivore_count >= self.params.max_herbivores:
                 return
             baby_herbi = Herbivore(self.params.herbivore_energy_value, self.params, new_genes, self, self.rand_instance, new_generation)
+            baby_herbi.position = animal1.position
+            baby_herbi.SET_parents(animal1, animal2)
             self.herbivores.append(baby_herbi)
             self.herbivore_count += 1
         elif isinstance(animal1, Carnivore):
             if self.carnivore_count >= self.params.max_carnivores:
                 return
             baby_carni = Carnivore(self.params.carnivore_energy_value, self.params, new_genes, self, self.rand_instance, new_generation)
+            baby_carni.SET_parents(animal1, animal2)
+            baby_carni.position = animal1.position
             self.carnivores.append(baby_carni)
             self.carnivore_count += 1
+            
             
     def get_foods(self, Animal):
         if isinstance(Animal, Herbivore):
@@ -216,8 +226,9 @@ class SimulationManager:
                 if len(self.best_carnivores) > self.num_best_carni:
                     self.best_carnivores.pop(0)
 
-                
+
         except:
+            print('Element: ', Element)
             print("Element not found")
 
     def run_simulation(self):
@@ -238,7 +249,7 @@ class SimulationManager:
                 time.sleep(self.params.sim_iteration_delay)
                 if self.herbivore_count == 0 and self.carnivore_count == 0:
                     break
-                
+                                
             self.generate_mutated_animals()
             self.plants.clear()
             self.plant_count = 0
