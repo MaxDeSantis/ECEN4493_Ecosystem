@@ -1,8 +1,8 @@
 import Utility
 from Utility import Position
 
-PLANT_ENERGY = 25
+from Element import Element
 
-class Plant:
-    def __init__(self, position:Position):
-        self.position = position
+class Plant (Element):
+    def __init__(self, position:Position, energy_value):
+        super().__init__(position, energy_value)
